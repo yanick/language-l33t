@@ -8,7 +8,7 @@ use Class::Std;
 use Readonly;
 use IO::Socket::INET;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %debug           : ATTR( :name<debug> :default(0) );
 my %code_of         : ATTR( :name<code> :default('') );
@@ -404,10 +404,10 @@ Ties the stdin/stdout of the interpreter to the given object.
 
 E.g.:
 
-    use IO::String;
-
     my $output;
-    my $l33t = Language::l33t->new({ stdout => IO::String->new( \$output ) });
+    open my $fh_output, '>', \$output;
+
+    my $l33t = Language::l33t->new({ stdout => $fh_output });
 
     $l33t->load( $code );
     $l33t->run;

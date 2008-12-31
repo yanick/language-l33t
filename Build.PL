@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
         'Class::Std'       => 0,
         'Readonly'         => 0,
         'Carp'             => 0,
-        'IO::Socket::INET' => 0,
+        'IO'               => 0,
         'Test::More'       => 0,
     },
     add_to_cleanup      => [ 'Language::l33t-*' ],

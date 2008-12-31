@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 
-use IO::String;
 use Test::More tests => 6;                      # last test to print
 
 use Language::l33t;
@@ -25,7 +24,8 @@ is $errors => "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n", 'program outside 
 # test if the byte size is respected, by default
 
 my $output;
-my $l33t = Language::l33t->new({ stdout => IO::String->new( \$output ) });
+open my $fh_output, '>', \$output;
+my $l33t = Language::l33t->new({ stdout => $fh_output });
 
 $l33t->load( '7 '.( '9'x( 256/9 ) ).' 7 7 1 5o5' );
 $l33t->run;
@@ -34,8 +34,10 @@ is ord($output) => $expected, 'default byte size';
 
 # test if the byte size is respected, if different than default
 
+close $fh_output;
 $output = undef;
-$l33t = Language::l33t->new({ stdout => IO::String->new( \$output ),
+open $fh_output, '>', \$output;
+$l33t = Language::l33t->new({ stdout => $fh_output,
                           byte_size => 11 });
 
 $l33t->load( '7 9 7 1 1 5o5' );

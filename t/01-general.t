@@ -4,11 +4,11 @@ use warnings;
 use Test::More tests => 6;
 
 use Language::l33t;
-use IO::String;
 
 my $output;
+open my $fh_output, '>', \$output;
 
-my $l33t = Language::l33t->new({ stdout => IO::String->new( \$output ) });
+my $l33t = Language::l33t->new({ stdout => $fh_output });
 
 $l33t->load( '7 75 55' );
 $l33t->run;

@@ -4,10 +4,10 @@ use warnings;
 use Test::More tests => 1;     
 
 use Language::l33t;
-use IO::String;
 
 my $output;
-my $l33t = Language::l33t->new({ stdout => IO::String->new( \$output ) });
+open my $fh_output, '>', \$output;
+my $l33t = Language::l33t->new({ stdout => $fh_output });
 
 $l33t->load( <<'END_CODE' );
     Gr34t l33tN3$$? 

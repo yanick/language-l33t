@@ -7,7 +7,7 @@ WriteMakefile
           'PREREQ_PM' => {
                            'Carp' => '0',
                            'Class::Std' => '0',
-                           'IO::Socket::INET' => '0',
+                           'IO' => '0',
                            'Readonly' => '0',
                            'Test::More' => '0'
                          },
