@@ -8,15 +8,15 @@ use Language::l33t;
 my $output;
 open my $fh_output, '>', \$output;
 
-my $l33t = Language::l33t->new({ stdout => $fh_output });
+my $l33t = Language::l33t->new( stdout => $fh_output );
 
 $l33t->load( '7 75 55' );
 $l33t->run;
-is( join( ':', $l33t->get_memory ), '7:12:10:13', 'INC' );
+is( join( ':', $l33t->memory ), '7:12:10:13', 'INC' );
 
 $l33t->load( '8 75 55' );
 $l33t->run;
-is( join( ':', $l33t->get_memory ), '8:12:10:243', 'DEC' );
+is( join( ':', $l33t->memory ), '8:12:10:243', 'DEC' );
 
 {
     local *STDERR;

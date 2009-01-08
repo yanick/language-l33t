@@ -4,23 +4,46 @@ use strict;
 use warnings;
 use Carp;
 
-use Class::Std;
+use MooseX::SemiAffordanceAccessor;
+use Moose;
+
+use Moose::Util::TypeConstraints;
+use MooseX::AttributeHelpers;
+
 use Readonly;
 use IO::Socket::INET;
 
 our $VERSION = '0.03';
 
-my %debug           : ATTR( :name<debug> :default(0) );
-my %code_of         : ATTR( :name<code> :default('') );
-                                                      # 64 * 1024
-my %memory_size_of  : ATTR( :init_arg<memory_size> :default(65536) );      
-my %byte_size_of    : ATTR( :init_arg<byte_size> :default(256) );
-my %memory_of       : ATTR;
-my %mem_ptr_of      : ATTR;
-my %op_ptr_of       : ATTR;
-my %stdout_of       : ATTR( :name<stdout> :default(0) );
-my %stdin_of        : ATTR( :name<stdin> :default(0) );
-my %socket_of       : ATTR;
+subtype 'l33tByteSize' 
+            => as 'Int' 
+            => where { $_ > 10 }
+            => message { "Byt3 s1z3 must be at l34st 11, n00b!" };
+
+has debug => ( default => 0, is => 'rw' );
+has code => ( is => 'rw' );
+
+has byte_size => ( is => 'rw', isa => 'l33tByteSize', default => 256 );
+
+has memory => ( 
+    metaclass => 'Collection::Array',
+    is => 'rw',
+    isa => 'ArrayRef[Int]',
+    auto_deref => 1,
+    provides => {
+        set => 'memory_set',
+        get => 'memory_index',
+    },
+    predicate => 'has_memory',
+);
+
+has memory_size => ( is => 'rw', default => 64 * 1024 );
+
+has mem_ptr => ( is => 'rw' );
+has op_ptr => ( is => 'rw' );
+has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
+has stdin => ( is => 'rw' ); 
+has 'socket' => ( is => 'rw' );
 
 my @op_codes;
 
@@ -48,56 +71,38 @@ $op_codes[$DEC] = \&_dec;
 $op_codes[$CON] = \&_con;
 $op_codes[$END] = \&_end;
 
-sub START {
-    my( $self, $id ) = @_;
-
-    if ( $byte_size_of{ $id } <= 10 ) {
-        local $Carp::CarpLevel = 1;
-        croak "Byt3 s1z3 must be at l34st 11, n00b!";
-    }
-}
-
 sub initialize {
     my $self = shift;
-    my $id = ident $self;
 
     # final zero for the initial memory
     my @memory = (  map ( { my $s = 0; 
                         $s += $& while /\d/g; 
-                        $s % $byte_size_of{ $id } 
-                      } split ' ', $code_of{ $id } ), 0 );
+                        $s % $self->byte_size 
+                      } split ' ', $self->code ), 0 );
 
-    if ( $memory_size_of{ $id } < @memory ) {
+    if ( $self->memory_size < @memory ) {
         warn "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n"; 
         return 0;
     }
 
-    $op_ptr_of{ $id } = 0;
-    $mem_ptr_of{ $id } = $#memory;
+    $self->set_op_ptr(0);
+    $self->set_mem_ptr( $#memory );
 
-    $memory_of{ $id } = \@memory;
+    $self->{memory} = \@memory ;
 
-    if( $debug{ $id } ) {
-        warn "compiled memory: ", join( ':', @{$memory_of{$id}} ), "\n";
+    if( $self->debug ) {
+        warn "compiled memory: ", join( ':', $self->memory ), "\n";
     }
 
     return 1;
 }
 
-sub get_memory {
-    my $self = shift;
-    my $id = ident $self;
-
-    return @{ $memory_of{ $id } };
-}
-
 sub load {
     my( $self, $code ) = @_;
-    my $id = ident $self;
 
-    $code_of{ $id } = $code;
+    $self->set_code( $code );
 
-    if( $debug{ $id } ) {
+    if( $self->debug ) {
         warn "code: $code\n";
     }
 
@@ -107,9 +112,8 @@ sub load {
 sub run {
     my $self = shift;
     my $nbr_iterations = shift || -1;
-    my $id = ident $self;
 
-    unless ( defined $memory_of{ $id } ) {
+    unless ( $self->has_memory ) {
        carp 'L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!';
        return 0;
     }
@@ -124,14 +128,13 @@ sub run {
 
 sub _iterate {
     my $self = shift;
-    my $id = ident $self;
-    my $op_id = $memory_of{ $id }[ $op_ptr_of{ $id } ]; 
+    my $op_id = $self->memory_index( $self->op_ptr ); 
  
-    if ( $debug{ $id } ) { 
+    if ( $self->debug ) { 
         no warnings qw/ uninitialized /;
-        warn "memory: ", join( ':', @{$memory_of{$id}} ), "\n";
-        warn "op_ptr: $op_ptr_of{ $id }, ",
-                "mem_ptr: $mem_ptr_of{ $id }, ",
+        warn "memory: ", join( ':', $self->memory ), "\n";
+        warn "op_ptr: $self->op_ptr, ",
+                "mem_ptr: $self->mem_ptr, ",
                 "op: $op_id, ",
                 "mem: ", $self->_get_current_mem, "\n";
     }
@@ -160,35 +163,32 @@ sub _end {
 sub _incr_op_ptr {
     my $self = shift;
     my $increment = shift || 1;
-    my $id = ident $self;
 
-    $op_ptr_of{ $id } += $increment;
+    $self->set_op_ptr( $self->op_ptr + $increment );
 }
 
 sub _incr_mem_ptr {
     my $self = shift;
     my $increment = shift || 1;
-    my $id = ident $self;
 
-    $mem_ptr_of{ $id } += $increment;
+    $self->set_mem_ptr( $self->mem_ptr + $increment );
 }
 
 sub _incr_mem {
     my $self = shift;
     my $increment = shift;
-    my $id = ident $self;
 
-    $memory_of{ $id }[ $mem_ptr_of{ $id } ] += $increment;
-    $memory_of{ $id }[ $mem_ptr_of{ $id } ] %= $byte_size_of{ $id };
+    $self->memory_set( $self->mem_ptr => 
+            ( $self->memory_index( $self->mem_ptr ) + $increment ) %
+            $self->byte_size );
 }
 
 sub _inc {
     my $self = shift;
     my $sign = shift || 1;
-    my $id = ident $self;
 
     $self->_incr_op_ptr;
-    $self->_incr_mem( $sign * ( 1 + $memory_of{ $id }[ $op_ptr_of{ $id } ] ) );
+    $self->_incr_mem( $sign * ( 1 + $self->memory_index( $self->op_ptr ) ) );
     $self->_incr_op_ptr;
     return 1;
 }
@@ -202,37 +202,33 @@ sub _dec {
 
 sub _set_current_mem {
     my $self = shift;
-    my $id = ident $self;
 
     croak( "_set_current_mem requires one argument" ) unless @_;
 
-    return $memory_of{ $id }[ $mem_ptr_of{$id} ] = shift;
+    return $self->memory_set( $self->mem_ptr => shift );
 }
 
 sub _get_current_mem {
     my $self = shift;
-    my $id = ident $self;
 
-    return $memory_of{ $id }[ $mem_ptr_of{$id} ];
+    return $self->memory_index( $self->mem_ptr );
 }
 
 sub _current_op {
     my $self = shift;
-    my $id = ident $self;
 
-    return $memory_of{ $id }[ $op_ptr_of{$id} ] || 0;
+    return $self->memory_index( $self->op_ptr ) || 0;
 }
 
 sub _if {
     my $self = shift;
-    my $id = ident $self;
 
     if ( $self->_get_current_mem ) {
         $self->_nop;
     }
     else {
         my $nest_level = 0;
-        my $max_iterations = $memory_size_of{ $id };
+        my $max_iterations = $self->memory_size;
 
         SCAN:
         while (1) {
@@ -250,10 +246,7 @@ sub _if {
                 }
             }
 
-            unless ( $max_iterations ) {
-                croak "dud3, wh3r3's my EIF?";
-            }
-            
+            croak "dud3, wh3r3's my EIF?" unless $max_iterations;
         }
     }
 
@@ -262,7 +255,6 @@ sub _if {
 
 sub _eif {
     my $self = shift;
-    my $id = ident $self;
 
     if ( ! $self->_get_current_mem ) {
         $self->_nop;
@@ -277,7 +269,6 @@ sub _eif {
 sub _fwd {
     my $self = shift;
     my $direction = shift || 1;
-    my $id = ident $self;
 
     $self->_incr_op_ptr;
     $self->_incr_mem_ptr( $direction * ( 1 + $self->_current_op )  );
@@ -290,9 +281,8 @@ sub _bak { $_[0]->_fwd( -1 ); return 1; }
 
 sub _wrt { 
     my $self = shift;
-    my $id = ident $self;
 
-    if ( my $io = $socket_of{ $id } || $stdout_of{ $id } ) {
+    if ( my $io = $self->socket || $self->stdout ) {
         no warnings qw/ uninitialized /;
         print {$io} chr $self->_get_current_mem;
     }
@@ -306,11 +296,10 @@ sub _wrt {
 
 sub _rd {
     my $self = shift;
-    my $id = ident $self;
 
     my $chr;
 
-    if ( my $io = $socket_of{ $id } || $stdin_of{ $id } ) {
+    if ( my $io = $self->socket || $self->stdin ) {
         read $io, $chr, 1;
     }
     else {
@@ -325,7 +314,6 @@ sub _rd {
 
 sub _con {
     my $self = shift;
-    my $id = ident $self;
 
     my $ip = join '.', map { 
                             my $x = $self->_get_current_mem; 
@@ -343,14 +331,14 @@ sub _con {
     $self->_incr_mem_ptr( -5 );
 
     warn "trying to connect at $ip:$port\n" 
-        if $debug{ $id };
+        if $self->debug;
 
     if ( "$ip:$port" eq '0.0.0.0:0' ) {
-        $socket_of{ $id } = undef;
+        $self->set_socket( undef );
     }
     else {
         if ( my $sock = IO::Socket::INET->new( "$ip:$port" ) ) {
-            $socket_of{ $id } = $sock;
+            $self->set_socket( $sock );
         } 
         else {
             warn "h0s7 5uXz0r5! c4N'7 c0Nn3<7 101010101 l4m3R !!!\n";
@@ -460,7 +448,7 @@ E.g.
     $l33t->run;
 
 
-=head2 get_memory
+=head2 memory
 
 Returns the memory of the interpreter in its current state as an array.
 

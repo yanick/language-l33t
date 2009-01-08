@@ -7,7 +7,7 @@ use Language::l33t;
 
 my $output;
 open my $fh_output, '>', \$output;
-my $l33t = Language::l33t->new({ stdout => $fh_output });
+my $l33t = Language::l33t->new( stdout => $fh_output );
 
 $l33t->load( <<'END_CODE' );
     Gr34t l33tN3$$? 
