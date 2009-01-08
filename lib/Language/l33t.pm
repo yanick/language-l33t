@@ -9,6 +9,7 @@ use Moose;
 
 use Moose::Util::TypeConstraints;
 use MooseX::AttributeHelpers;
+use MooseX::Method::Signatures;
 
 use Readonly;
 use IO::Socket::INET;
@@ -71,9 +72,7 @@ $op_codes[$DEC] = \&_dec;
 $op_codes[$CON] = \&_con;
 $op_codes[$END] = \&_end;
 
-sub initialize {
-    my $self = shift;
-
+method initialize {
     # final zero for the initial memory
     my @memory = (  map ( { my $s = 0; 
                         $s += $& while /\d/g; 
@@ -97,9 +96,7 @@ sub initialize {
     return 1;
 }
 
-sub load {
-    my( $self, $code ) = @_;
-
+method load ( Str $code ) {
     $self->set_code( $code );
 
     if( $self->debug ) {
@@ -109,10 +106,7 @@ sub load {
     return $self->initialize;
 }
 
-sub run {
-    my $self = shift;
-    my $nbr_iterations = shift || -1;
-
+method run ( Int $nbr_iterations = -1 ) {
     unless ( $self->has_memory ) {
        carp 'L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!';
        return 0;
@@ -126,8 +120,7 @@ sub run {
     return 0;
 }
 
-sub _iterate {
-    my $self = shift;
+method _iterate {
     my $op_id = $self->memory_index( $self->op_ptr ); 
  
     if ( $self->debug ) { 
@@ -149,80 +142,53 @@ sub _iterate {
     }
 }
 
-sub _nop {
-    my $self = shift;
+method _nop {
     $self->_incr_op_ptr;
     return 1;
 }
 
-sub _end {
-    my $self = shift;
+method _end {
     return 0;
 }
 
-sub _incr_op_ptr {
-    my $self = shift;
-    my $increment = shift || 1;
-
+method _incr_op_ptr ( $increment = 1 ) {
     $self->set_op_ptr( $self->op_ptr + $increment );
 }
 
-sub _incr_mem_ptr {
-    my $self = shift;
-    my $increment = shift || 1;
-
+method _incr_mem_ptr ( $increment = 1 ) {
     $self->set_mem_ptr( $self->mem_ptr + $increment );
 }
 
-sub _incr_mem {
-    my $self = shift;
-    my $increment = shift;
-
+method _incr_mem ( $increment ) {
     $self->memory_set( $self->mem_ptr => 
             ( $self->memory_index( $self->mem_ptr ) + $increment ) %
             $self->byte_size );
 }
 
-sub _inc {
-    my $self = shift;
-    my $sign = shift || 1;
-
+method _inc ( $sign = 1 ) {
     $self->_incr_op_ptr;
     $self->_incr_mem( $sign * ( 1 + $self->memory_index( $self->op_ptr ) ) );
     $self->_incr_op_ptr;
     return 1;
 }
 
-sub _dec {
-    my $self = shift;
-    $self->_inc( -1 );
-
-    return 1;
+method _dec {
+    return $self->_inc( -1 );
 }
 
-sub _set_current_mem {
-    my $self = shift;
-
-    croak( "_set_current_mem requires one argument" ) unless @_;
-
-    return $self->memory_set( $self->mem_ptr => shift );
+method _set_current_mem ( Int $value ) {
+    return $self->memory_set( $self->mem_ptr => $value );
 }
 
-sub _get_current_mem {
-    my $self = shift;
-
+method _get_current_mem {
     return $self->memory_index( $self->mem_ptr );
 }
 
-sub _current_op {
-    my $self = shift;
-
+method _current_op {
     return $self->memory_index( $self->op_ptr ) || 0;
 }
 
-sub _if {
-    my $self = shift;
-
+method _if {
     if ( $self->_get_current_mem ) {
         $self->_nop;
     }
@@ -253,9 +219,7 @@ sub _if {
     return 1;
 }
 
-sub _eif {
-    my $self = shift;
-
+method _eif {
     if ( ! $self->_get_current_mem ) {
         $self->_nop;
     }
@@ -266,10 +230,7 @@ sub _eif {
     return 1;
 }
 
-sub _fwd {
-    my $self = shift;
-    my $direction = shift || 1;
-
+method _fwd( $direction = 1 ) {
     $self->_incr_op_ptr;
     $self->_incr_mem_ptr( $direction * ( 1 + $self->_current_op )  );
     $self->_incr_op_ptr;
@@ -277,11 +238,9 @@ sub _fwd {
     return 1;
 }
 
-sub _bak { $_[0]->_fwd( -1 ); return 1; }
+method  _bak { $self->_fwd( -1 ); return 1; }
 
-sub _wrt { 
-    my $self = shift;
-
+method _wrt { 
     if ( my $io = $self->socket || $self->stdout ) {
         no warnings qw/ uninitialized /;
         print {$io} chr $self->_get_current_mem;
@@ -294,9 +253,7 @@ sub _wrt {
     return 1;
 }
 
-sub _rd {
-    my $self = shift;
-
+method _rd {
     my $chr;
 
     if ( my $io = $self->socket || $self->stdin ) {
@@ -312,9 +269,7 @@ sub _rd {
     return 1;
 }
 
-sub _con {
-    my $self = shift;
-
+method _con {
     my $ip = join '.', map { 
                             my $x = $self->_get_current_mem; 
                             $self->_incr_mem_ptr;
