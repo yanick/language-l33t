@@ -10,6 +10,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::AttributeHelpers;
 use MooseX::Method::Signatures;
+use MooseX::MakeImmutable;
 
 use Readonly;
 use IO::Socket::INET;
@@ -303,6 +304,8 @@ method _con {
     $self->_incr_op_ptr;
     return 1;
 }
+
+MooseX::MakeImmutable->lock_down;
 
 1; # End of Language::l33t
 
