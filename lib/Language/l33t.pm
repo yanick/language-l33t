@@ -152,8 +152,8 @@ method _end {
     return 0;
 }
 
-method _incr_op_ptr ( $increment = 1 ) {
-    $self->set_op_ptr( $self->op_ptr + $increment );
+sub _incr_op_ptr {
+    $_[0]->set_op_ptr( $_[0]->op_ptr + ( $_[1] || 1 ) );
 }
 
 method _incr_mem_ptr ( $increment = 1 ) {
@@ -185,8 +185,8 @@ method _get_current_mem {
     return $self->memory_index( $self->mem_ptr );
 }
 
-method _current_op {
-    return $self->memory_index( $self->op_ptr ) || 0;
+sub _current_op {
+    return $_[0]->memory_index( $_[0]->op_ptr ) || 0;
 }
 
 method _if {
