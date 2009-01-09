@@ -135,12 +135,8 @@ method _iterate {
 
     warn "j00 4r3 teh 5ux0r\n" if $op_id > 10;
 
-    if ( my $op = $op_codes[ $op_id ] ) {
-        return $op_codes[ $op_id ]->( $self );
-    }
-    else {
-        return $self->_nop;
-    }
+    my $op = $op_codes[ $op_id ] || $op_codes[ $NOP ];
+    return $op->( $self );
 }
 
 method _nop {
