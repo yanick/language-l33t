@@ -5,7 +5,7 @@ META.yml # Will be created by "make dist"
 README
 lib/Language/l33t.pm
 t/00-load.t
-t/01-general.t
-t/02-samples.t
-t/03-memory.t
 Makefile.PL
+t/test-class-loader.t
+t/tests/Language/l33t/Test.pm
+t/tests/Test/Class/Runnable.pm

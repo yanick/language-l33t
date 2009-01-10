@@ -1,0 +1,8 @@
+nytprof
+tmon.out
+.swp$
+MANIFEST.SKIP
+\.git
+_build
+Build
+\.orig$
