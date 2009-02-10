@@ -1,29 +1,27 @@
-package Language::l33t::Operators;
+{ package Language::l33t::Operators; our $VERSION = "0.03"; }
 
-use strict;
-use warnings;
+use MooseX::Declare;
 
-use Moose::Role;
+role Language::l33t::Operators {
 
-use MooseX::Method::Signatures;
 use Readonly;
 use Carp;
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
 
-Readonly my $NOP => 0;
-Readonly my $WRT => 1;
-Readonly my $RD  => 2;
-Readonly my $IF  => 3;
-Readonly my $EIF => 4;
-Readonly my $FWD => 5;
-Readonly my $BAK => 6;
-Readonly my $INC => 7;
-Readonly my $DEC => 8;
-Readonly my $CON => 9;
-Readonly my $END => 10;
+Readonly our $NOP => 0;
+Readonly our $WRT => 1;
+Readonly our $RD  => 2;
+Readonly our $IF  => 3;
+Readonly our $EIF => 4;
+Readonly our $FWD => 5;
+Readonly our $BAK => 6;
+Readonly our $INC => 7;
+Readonly our $DEC => 8;
+Readonly our $CON => 9;
+Readonly our $END => 10;
 
-my @op_codes;
+our @op_codes;
 
 $op_codes[$NOP] = \&_nop;
 $op_codes[$WRT] = \&_wrt;
@@ -189,4 +187,7 @@ method _eif {
 
     return 1;
 }
+
+}
+
 1;
