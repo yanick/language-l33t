@@ -1,5 +1,3 @@
-{ package Language::l33t::Operators; our $VERSION = "0.03"; }
-
 use MooseX::Declare;
 
 role Language::l33t::Operators {
@@ -8,6 +6,8 @@ use Readonly;
 use Carp;
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
+
+our $VERSION = "0.03";
 
 Readonly our $NOP => 0;
 Readonly our $WRT => 1;

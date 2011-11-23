@@ -4,6 +4,7 @@ MANIFEST
 META.yml # Will be created by "make dist"
 README
 lib/Language/l33t.pm
+lib/Language/l33t/Operators.pm
 t/00-load.t
 Makefile.PL
 t/test-class-loader.t

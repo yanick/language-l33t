@@ -1,4 +1,7 @@
-{ package Language::l33t; our $VERSION = '0.03'; }
+{ 
+    package Language::l33t; 
+    our $VERSION = '0.03'; 
+}
 
 use MooseX::Declare;
 
