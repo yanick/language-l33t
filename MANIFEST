@@ -1,12 +1,22 @@
+AUTHOR_PLEDGE
 Build.PL
 Changes
+INSTALL
+LICENSE
 MANIFEST
-META.yml # Will be created by "make dist"
+META.json
+META.yml
 README
+README.mkdn
+SIGNATURE
 lib/Language/l33t.pm
 lib/Language/l33t/Operators.pm
+lib/Language/l33t/Specifications.pod
+script/l33t
+server
+t/00-compile.t
 t/00-load.t
-Makefile.PL
-t/test-class-loader.t
-t/tests/Language/l33t/Test.pm
-t/tests/Test/Class/Runnable.pm
+t/000-report-versions-tiny.t
+t/basic.t
+t/sample1.t
+xt/release/unused-vars.t

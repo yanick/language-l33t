@@ -1,5 +1,9 @@
 Revision history for Language::l33t
 
+{{$NEXT}}
+    * conversion to Moose.
+    * added the language specs, as the original webpage is gone.
+
 0.03   Jul 3, 2006
     * Remove depedency to IO::String
 

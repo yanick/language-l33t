@@ -1,3 +1,5 @@
+# PODNAME: Language::l33t::Specifications
+
 =head1 NAME
 
 Language::l33t::Specifications - l33t's specs

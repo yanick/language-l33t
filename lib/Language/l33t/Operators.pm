@@ -1,13 +1,13 @@
-use MooseX::Declare;
+package Language::l33t::Operators;
+# ABSTRACT: Implementation of the l33t language operators
 
-role Language::l33t::Operators {
+use Moose::Role;
 
+use Method::Signatures;
 use Readonly;
 use Carp;
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
-
-our $VERSION = "0.03";
 
 Readonly our $NOP => 0;
 Readonly our $WRT => 1;
@@ -189,6 +189,5 @@ method _eif {
     return 1;
 }
 
-}
 
 1;
