@@ -1,4 +1,10 @@
 package Language::l33t::Operators;
+BEGIN {
+  $Language::l33t::Operators::AUTHORITY = 'cpan:YANICK';
+}
+{
+  $Language::l33t::Operators::VERSION = '1.0.0';
+}
 # ABSTRACT: Implementation of the l33t language operators
 
 use Moose::Role;
@@ -191,3 +197,28 @@ method _eif {
 
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Language::l33t::Operators - Implementation of the l33t language operators
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

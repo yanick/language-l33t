@@ -1,5 +1,17 @@
 # PODNAME: Language::l33t::Specifications
 
+__END__
+
+=pod
+
+=head1 NAME
+
+Language::l33t::Specifications
+
+=head1 VERSION
+
+version 1.0.0
+
 =head1 NAME
 
 Language::l33t::Specifications - l33t's specs
@@ -48,7 +60,6 @@ The Opcodes
 The l33t language consists of 10 opCodes, all of them in the form of decimal
 numbers. They are as follows:
 
-    
    VALUE OPCODE DESCRIPTION
 
        0 NOP    No Operation, except to increment                 
@@ -110,7 +121,7 @@ l33t code as pseudo-code, nothing more. Writing INC in your source will do
 nothing (it will evaluate to 0, NOP); writing “pH34r” will do something (it
 will evaluate to 7, INC).
 
-=head2  ... And Now The Bad News...
+=head2 ... And Now The Bad News...
 
 A few points to be aware of:
 
@@ -165,3 +176,16 @@ block (i.e. a 16-bit unsigned integer in the case of a
 =head1 AUTHOR
 
 Stephen McGreal (originally from L<http://electrod.ifreepages.com/l33tspec.htm>)
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

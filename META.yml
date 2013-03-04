@@ -1,0 +1,46 @@
+---
+abstract: 'a l33t interpreter'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::More: 0.88
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Language-l33t
+provides:
+  Language::l33t:
+    file: lib/Language/l33t.pm
+    version: v1.0.0
+  Language::l33t::Operators:
+    file: lib/Language/l33t/Operators.pm
+    version: v1.0.0
+requires:
+  Carp: 0
+  IO::Socket::INET: 0
+  Method::Signatures: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::SemiAffordanceAccessor: 0
+  Readonly: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Language-l33t
+  homepage: http://search.cpan.org/dist/Language-l33t/
+  repository: https://github.com/yanick/language-l33t.git
+version: 1.0.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
