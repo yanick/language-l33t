@@ -87,6 +87,12 @@ after _clear_memory => sub {
     $self->set_mem_ptr(0);
 };
 
+sub reset {
+    my $self = shift;
+    $self->_clear_memory;
+    $self->memory;
+}
+
 
 has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
 has stdin => ( is => 'rw' ); 
@@ -162,7 +168,7 @@ Language::l33t - a l33t interpreter
     use Language::l33t;
 
     my $interpreter = Language::l33t->new;
-    $interpreter->load( 'Ph34r my l33t sk1llz' );
+    $interpreter->set_source( 'Ph34r my l33t sk1llz' );
     $interpreter->run;
 
 =head1 DESCRIPTION
@@ -173,7 +179,7 @@ to the REFERENCE section.
 
 =head1 METHODS
 
-=head2 new( \%options )
+=head2 new( %options )
 
 Creates a new interpreter. The options that can be passed to the function are:
 
@@ -186,25 +192,27 @@ as it does its thing.
 
 =item stdin => $io
 
+Ties the stdin of the interpreter to the given object.
+
 =item stdout => $io
 
-Ties the stdin/stdout of the interpreter to the given object. 
+Ties the stdout of the interpreter to the given object. 
 
 E.g.:
 
     my $output;
     open my $fh_output, '>', \$output;
 
-    my $l33t = Language::l33t->new({ stdout => $fh_output });
+    my $l33t = Language::l33t->new( stdout => $fh_output );
 
-    $l33t->load( $code );
+    $l33t->set_source( $code );
     $l33t->run;
 
     print "l33t output: $output";
 
-=item memory_size => $bytes
+=item memory_max_size => $bytes
 
-The size of the block of memory used by the interpreter. By default set to
+The size of the block of memory available to interpreter. By default set to
 64K (as the specs recomment).
 
 =item byte_size => $size
@@ -213,14 +221,12 @@ The size of a byte in the memory used by the interpreter. Defaults to
 256 (so a memory byte can hold a value going from 0 to 255).
 
 
-
 =back
 
-=head2 load( $l33tcode )
+=head2 set_source( $l33tcode )
 
 Loads and "compiles" the string $l33tcode. If one program was already loaded,
-it is clobbered by the newcomer. Returns 1 upon success, 0 if the loading
-failed.
+it is clobbered by the newcomer. 
 
 =head2 run( [ $nbr_iterations ] )
 
@@ -229,13 +235,10 @@ after this number of iterations even if it hasn't terminated. Returns 0 in
 case the program terminated by evaluating an END, 1 if it finished by reaching
 $nbr_iterations.
 
-=head2 initialize
+=head2 reset
 
-Initializes, or reinitializes the interpreter to its initial setting. Code is
-recompiled, and pointers reset to their initial values. Implicitly called when
-new code is load()ed. 
-
-Returns 1 upon success, 0 if something went wrong.
+Reset the interpreter to its initial setting. Code is
+recompiled, and pointers reset to their initial values. 
 
 E.g.
 
@@ -244,7 +247,7 @@ E.g.
     $l33t->run;
 
     # to run the same code a second time
-    $l33t->initialize;
+    $l33t->reset;
     $l33t->run;
 
 
