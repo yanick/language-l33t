@@ -1,6 +1,8 @@
 Revision history for Language::l33t
 
 {{$NEXT}}
+
+1.0.0     2013-03-04
     * conversion to Moose.
     * added the language specs, as the original webpage is gone.
 
