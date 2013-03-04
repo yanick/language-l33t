@@ -1,4 +1,5 @@
 package Language::l33t; 
+# ABSTRACT: a l33t interpreter
 
 use strict;
 use warnings;
@@ -155,13 +156,11 @@ sub _current_op {
     return $_[0]->memory_cell( $_[0]->op_ptr ) || 0;
 }
 
-1; # End of Language::l33t
+__PACKAGE__->meta->make_immutable;
+
+'End of Language::l33t';
 
 __END__
-
-=head1 NAME
-
-Language::l33t - a l33t interpreter
 
 =head1 SYNOPSIS
 
@@ -175,7 +174,7 @@ Language::l33t - a l33t interpreter
 
 Language::l33t is a Perl interpreter of the l33t language created by
 Stephen McGreal and Alex Mole. For the specifications of l33t, refer
-to the REFERENCE section.
+to L<Language::l33t::Specifications>.
 
 =head1 METHODS
 
@@ -278,64 +277,15 @@ run() called before any program was load()ed.
 
 =back
 
-=head1 BUGS
+=head1 SEE ALSO
 
-Please report any bugs or feature requests to
-C<bug-acme-l33t at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Language::l33t>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Language::l33t
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Language::l33t>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Language::l33t>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Language::l33t>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Language::l33t>
-
-=back
-
-=head1 REFERENCES
-
-Stephen McGreal's l33t page: http://electrod.ifreepages.com/l33t.htm
-
-Wikipedia article on l33t: http://en.wikipedia.org/wiki/L33t_programming_language
-
-=head1 AUTHOR
-
-Yanick Champoux, C<< <yanick at cpan.org> >>
+L<Language::l33t::Specifications>
 
 =head1 THANKS 
 
 It goes without saying, special thanks go 
 to Stephen McGreal and Alex Mole for inventing l33t. 
 They are teh rOxX0rs.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2006 Yanick Champoux, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 =cut
 
