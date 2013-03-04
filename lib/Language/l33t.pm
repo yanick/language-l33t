@@ -1,22 +1,20 @@
-{ 
-    package Language::l33t; 
-    our $VERSION = '0.03'; 
-}
+package Language::l33t; 
 
-use MooseX::Declare;
+use strict;
+use warnings;
 
-class Language::l33t 
-        with Language::l33t::Operators {
-
+use Moose;
 use Carp;
 
 use MooseX::SemiAffordanceAccessor;
-
 use Moose::Util::TypeConstraints;
-use MooseX::AttributeHelpers;
+use Method::Signatures;
 
 use Readonly;
 use IO::Socket::INET;
+
+with 'Language::l33t::Operators';
+
 
 subtype 'l33tByteSize' 
             => as 'Int' 
@@ -26,67 +24,77 @@ subtype 'l33tByteSize'
 has debug => ( default => 0, is => 'rw' );
 has code => ( is => 'rw' );
 
-has byte_size => ( is => 'rw', isa => 'l33tByteSize', default => 256 );
-
-has memory => ( 
-    metaclass => 'Collection::Array',
+has source => (
     is => 'rw',
-    isa => 'ArrayRef[Int]',
-    auto_deref => 1,
-    provides => {
-        set => 'memory_set',
-        get => 'memory_index',
+    predicate => 'has_source',
+    clearer => 'clear_source',
+    trigger => sub {
+        $_[0]->_clear_memory;
+        $_[0]->_memory;
     },
-    predicate => 'has_memory',
 );
 
-has memory_size => ( is => 'rw', default => 64 * 1024 );
+has byte_size => ( is => 'ro', isa => 'l33tByteSize', default => 256 );
 
-has mem_ptr => ( is => 'rw' );
-has op_ptr => ( is => 'rw' );
+has _memory => ( 
+    traits => [ 'Array' ],
+    is => 'rw',
+    writer => '_set_memory',
+    predicate => '_has_memory',
+    clearer => '_clear_memory',
+    isa => 'ArrayRef[Int]',
+    lazy_build => 1,
+    handles => {
+        memory => 'elements',
+        set_memory_cell => 'set',
+        memory_size => 'count',
+        memory_cell => 'get',
+    },
+);
+
+method _build__memory {
+    my @memory = ( map ( { my $s = 0; 
+                        $s += $& while /\d/g; 
+                        $s % $self->byte_size 
+                      } split ' ', $self->source ), 0 );
+
+
+    die "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n" 
+        if $self->memory_max_size < @memory;
+
+    $self->set_mem_ptr( $#memory );
+    return [ @memory ];
+}
+
+has memory_max_size => ( 
+    is => 'ro', 
+    default => 64 * 1024,
+);
+
+has mem_ptr => ( 
+    is => 'rw',
+);
+
+has op_ptr => ( 
+    isa => 'Int',
+    default => 0,
+    is => 'rw',
+);
+
+after _clear_memory => sub {
+    my $self = shift;
+    $self->set_op_ptr(0);
+    $self->set_mem_ptr(0);
+};
+
+
 has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
 has stdin => ( is => 'rw' ); 
 has 'socket' => ( is => 'rw' );
 
-method initialize {
-    # final zero for the initial memory
-    my @memory = (  map ( { my $s = 0; 
-                        $s += $& while /\d/g; 
-                        $s % $self->byte_size 
-                      } split ' ', $self->code ), 0 );
-
-    if ( $self->memory_size < @memory ) {
-        warn "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n"; 
-        return 0;
-    }
-
-    $self->set_op_ptr(0);
-    $self->set_mem_ptr( $#memory );
-
-    $self->{memory} = \@memory ;
-
-    if( $self->debug ) {
-        warn "compiled memory: ", join( ':', $self->memory ), "\n";
-    }
-
-    return 1;
-}
-
-method load ( Str $code ) {
-    $self->set_code( $code );
-
-    if( $self->debug ) {
-        warn "code: $code\n";
-    }
-
-    return $self->initialize;
-}
-
 method run ( Int $nbr_iterations = -1 ) {
-    unless ( $self->has_memory ) {
-       carp 'L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!';
-       return 0;
-    }
+    die "L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!\n"
+        unless $self->_has_memory;
   
     while ( $self->_iterate ) {
         $nbr_iterations-- if $nbr_iterations != -1;
@@ -97,7 +105,7 @@ method run ( Int $nbr_iterations = -1 ) {
 }
 
 method _iterate {
-    my $op_id = $self->memory_index( $self->op_ptr ); 
+    my $op_id = $self->memory_cell( $self->op_ptr ); 
  
     if ( $self->debug ) { 
         no warnings qw/ uninitialized /;
@@ -118,14 +126,14 @@ sub _incr_op_ptr {
 sub _incr_mem_ptr {
     my ( $self, $increment ) = @_;
     $increment ||= 1;
-    $self->set_mem_ptr( $self->mem_ptr + $increment );
+    $self->set_mem_ptr( ( $self->mem_ptr + $increment ) % $self->byte_size );
 }
 
 sub _incr_mem {
     my ( $self, $increment ) = @_;
     no warnings qw/ uninitialized /;
-    $self->memory_set( $self->mem_ptr => 
-            ( $self->memory_index( $self->mem_ptr ) + $increment ) %
+    $self->set_memory_cell( $self->mem_ptr => 
+            ( $self->memory_cell( $self->mem_ptr ) + $increment ) %
             $self->byte_size );
 }
 
@@ -134,13 +142,11 @@ method _set_current_mem ( Int $value ) {
 }
 
 method _get_current_mem {
-    return $self->memory_index( $self->mem_ptr );
+    return $self->memory_cell( $self->mem_ptr );
 }
 
 sub _current_op {
-    return $_[0]->memory_index( $_[0]->op_ptr ) || 0;
-}
-
+    return $_[0]->memory_cell( $_[0]->op_ptr ) || 0;
 }
 
 1; # End of Language::l33t

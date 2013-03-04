@@ -49,7 +49,7 @@ sub _inc {
     my $self = shift;
     my $sign = shift || 1;
     $self->_incr_op_ptr;
-    $self->_incr_mem( $sign * ( 1 + $self->memory_index( $self->op_ptr ) ) );
+    $self->_incr_mem( $sign * ( 1 + $self->memory_cell( $self->op_ptr ) ) );
     $self->_incr_op_ptr;
     return 1;
 }
@@ -117,6 +117,7 @@ sub _fwd {
 sub  _bak { return $_[0]->_fwd( -1 ); }
 
 method _wrt { 
+        $DB::single = 1;
     if ( my $io = $self->socket || $self->stdout ) {
         no warnings qw/ uninitialized /;
         print {$io} chr $self->_get_current_mem;
