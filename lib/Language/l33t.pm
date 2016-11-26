@@ -14,7 +14,6 @@ use Carp;
 
 use Moose::Util::TypeConstraints;
 
-use Readonly;
 use IO::Socket::INET;
 
 use experimental 'signatures';

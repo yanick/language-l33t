@@ -3,24 +3,24 @@ package Language::l33t::Operators;
 
 use Moo::Role;
 
-use Readonly;
+use Const::Fast;
 use Carp;
 
 use experimental 'signatures';
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
 
-Readonly our $NOP => 0;
-Readonly our $WRT => 1;
-Readonly our $RD  => 2;
-Readonly our $IF  => 3;
-Readonly our $EIF => 4;
-Readonly our $FWD => 5;
-Readonly our $BAK => 6;
-Readonly our $INC => 7;
-Readonly our $DEC => 8;
-Readonly our $CON => 9;
-Readonly our $END => 10;
+const our $NOP => 0;
+const our $WRT => 1;
+const our $RD  => 2;
+const our $IF  => 3;
+const our $EIF => 4;
+const our $FWD => 5;
+const our $BAK => 6;
+const our $INC => 7;
+const our $DEC => 8;
+const our $CON => 9;
+const our $END => 10;
 
 our @op_codes;
 

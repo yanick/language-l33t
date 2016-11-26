@@ -6,6 +6,7 @@ Revision history for Language::l33t
     - Switch to Type::Tiny.
     - Switch from Moose to Moo.
     - Use MooseX::MungeHas.
+    - Switch from Readonly to Const::Fast.
 
 1.0.0     2013-03-04
     * conversion to Moose.
