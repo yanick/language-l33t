@@ -166,8 +166,6 @@ sub _current_op {
     return $_[0]->memory_cell( $_[0]->op_ptr ) || 0;
 }
 
-__PACKAGE__->meta->make_immutable;
-
 'End of Language::l33t';
 
 __END__
