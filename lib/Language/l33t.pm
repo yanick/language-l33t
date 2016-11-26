@@ -1,6 +1,8 @@
 package Language::l33t; 
 # ABSTRACT: a l33t interpreter
 
+use 5.20.0;
+
 use strict;
 use warnings;
 
@@ -8,13 +10,13 @@ use Moose;
 use Carp;
 
 use Moose::Util::TypeConstraints;
-use Method::Signatures;
 
 use Readonly;
 use IO::Socket::INET;
 
-with 'Language::l33t::Operators';
+use experimental 'signatures';
 
+with 'Language::l33t::Operators';
 
 subtype 'l33tByteSize' 
             => as 'Int' 
@@ -52,7 +54,7 @@ has _memory => (
     },
 );
 
-method _build__memory {
+sub _build__memory($self) {
     my @memory = ( map ( { my $s = 0; 
                         $s += $& while /\d/g; 
                         $s % $self->byte_size 
@@ -98,7 +100,7 @@ has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
 has stdin => ( is => 'rw' ); 
 has 'socket' => ( is => 'rw' );
 
-method run ( Int $nbr_iterations = -1 ) {
+sub run ( $self, $nbr_iterations = -1 ) {
     die "L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!\n"
         unless $self->_has_memory;
   
@@ -110,7 +112,7 @@ method run ( Int $nbr_iterations = -1 ) {
     return 0;
 }
 
-method _iterate {
+sub _iterate($self) {
     my $op_id = $self->memory_cell( $self->op_ptr ); 
  
     if ( $self->debug ) { 
@@ -143,11 +145,12 @@ sub _incr_mem {
             $self->byte_size );
 }
 
-method _set_current_mem ( Int $value ) {
+sub _set_current_mem ($self, $value ) {
     return $self->memory_set( $self->mem_ptr => $value );
 }
 
-method _get_current_mem {
+
+sub _get_current_mem($self) {
     return $self->memory_cell( $self->mem_ptr );
 }
 

@@ -3,9 +3,10 @@ package Language::l33t::Operators;
 
 use Moose::Role;
 
-use Method::Signatures;
 use Readonly;
 use Carp;
+
+use experimental 'signatures';
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
 
@@ -68,7 +69,7 @@ sub _end {
 }
 
 
-method _con {
+sub _con($self) {
     my $ip = join '.', map { 
                             my $x = $self->_get_current_mem; 
                             $self->_incr_mem_ptr;
@@ -116,8 +117,7 @@ sub _fwd {
 
 sub  _bak { return $_[0]->_fwd( -1 ); }
 
-method _wrt { 
-        $DB::single = 1;
+sub _wrt($self) { 
     if ( my $io = $self->socket || $self->stdout ) {
         no warnings qw/ uninitialized /;
         print {$io} chr $self->_get_current_mem;
@@ -130,7 +130,7 @@ method _wrt {
     return 1;
 }
 
-method _rd {
+sub _rd($self) {
     my $chr;
 
     if ( my $io = $self->socket || $self->stdin ) {
@@ -147,7 +147,7 @@ method _rd {
 }
 
 
-method _if {
+sub _if($self) {
     if ( $self->_get_current_mem ) {
         $self->_nop;
     }
@@ -178,7 +178,7 @@ method _if {
     return 1;
 }
 
-method _eif {
+sub _eif($self) {
     if ( ! $self->_get_current_mem ) {
         $self->_nop;
     }
