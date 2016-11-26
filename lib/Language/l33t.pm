@@ -162,8 +162,8 @@ sub _get_current_mem($self) {
     return $self->memory_cell( $self->mem_ptr );
 }
 
-sub _current_op {
-    return $_[0]->memory_cell( $_[0]->op_ptr ) || 0;
+sub _current_op($self) {
+    return $self->memory_cell( $self->op_ptr ) || 0;
 }
 
 'End of Language::l33t';
