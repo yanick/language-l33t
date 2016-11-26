@@ -1,50 +1,58 @@
 package Language::l33t; 
 # ABSTRACT: a l33t interpreter
 
+use 5.20.0;
+
 use strict;
 use warnings;
 
-use Moose;
+use Moo;
+use MooX::HandlesVia;
+use MooseX::MungeHas 'is_rw';
+
 use Carp;
 
-use MooseX::SemiAffordanceAccessor;
 use Moose::Util::TypeConstraints;
-use Method::Signatures;
 
-use Readonly;
 use IO::Socket::INET;
+
+use experimental 'signatures';
 
 with 'Language::l33t::Operators';
 
+use Types::Standard qw/ Int ArrayRef /;
+use Type::Tiny;
 
-subtype 'l33tByteSize' 
-            => as 'Int' 
-            => where { $_ > 10 }
-            => message { "Byt3 s1z3 must be at l34st 11, n00b!" };
+my $l33tByteSize = Type::Tiny->new(
+    name       => 'L33tByteSize',
+    parent     => Int,
+    constraint => sub { $_ > 10 },
+    message    => sub  { "Byt3 s1z3 must be at l34st 11, n00b!" }
+);
 
-has debug => ( default => 0, is => 'rw' );
-has code => ( is => 'rw' );
+has debug => sub { 0 };
+
+has code => ();
 
 has source => (
-    is => 'rw',
-    predicate => 'has_source',
-    clearer => 'clear_source',
-    trigger => sub {
-        $_[0]->_clear_memory;
-        $_[0]->_memory;
+    predicate => 1,
+    clearer   => 1,
+    trigger   => sub($self,@) {
+        $self->_clear_memory;
+        $self->_memory;
     },
 );
 
-has byte_size => ( is => 'ro', isa => 'l33tByteSize', default => 256 );
+has byte_size => ( is => 'ro', isa => $l33tByteSize, default => 256 );
 
 has _memory => ( 
-    traits => [ 'Array' ],
-    is => 'rw',
     writer => '_set_memory',
     predicate => '_has_memory',
     clearer => '_clear_memory',
-    isa => 'ArrayRef[Int]',
-    lazy_build => 1,
+    isa => ArrayRef[Int],
+    lazy => 1,
+    builder => 1,
+    handles_via => 'Array',
     handles => {
         memory => 'elements',
         set_memory_cell => 'set',
@@ -53,7 +61,7 @@ has _memory => (
     },
 );
 
-method _build__memory {
+sub _build__memory($self) {
     my @memory = ( map ( { my $s = 0; 
                         $s += $& while /\d/g; 
                         $s % $self->byte_size 
@@ -63,45 +71,43 @@ method _build__memory {
     die "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n" 
         if $self->memory_max_size < @memory;
 
-    $self->set_mem_ptr( $#memory );
+    $self->mem_ptr( $#memory );
     return [ @memory ];
 }
 
 has memory_max_size => ( 
-    is => 'ro', 
+    is      => 'ro',
     default => 64 * 1024,
 );
 
-has mem_ptr => ( 
-    is => 'rw',
-);
+has mem_ptr => (); 
 
 has op_ptr => ( 
-    isa => 'Int',
+    isa     => Int,
     default => 0,
-    is => 'rw',
 );
 
-after _clear_memory => sub {
-    my $self = shift;
-    $self->set_op_ptr(0);
-    $self->set_mem_ptr(0);
+after _clear_memory => sub($self) {
+    $self->op_ptr(0);
+    $self->mem_ptr(0);
 };
 
-sub reset {
-    my $self = shift;
+sub reset($self) {
     $self->_clear_memory;
     $self->memory;
 }
 
 
-has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
-has stdin => ( is => 'rw' ); 
-has 'socket' => ( is => 'rw' );
+has stdout => sub { return \*STDOUT;  };
+has stdin  => ();
+has socket => ();
 
-method run ( Int $nbr_iterations = -1 ) {
+before run => sub($self,@) {
     die "L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!\n"
         unless $self->_has_memory;
+};
+
+sub run ( $self, $nbr_iterations = -1 ) {
   
     while ( $self->_iterate ) {
         $nbr_iterations-- if $nbr_iterations != -1;
@@ -111,7 +117,7 @@ method run ( Int $nbr_iterations = -1 ) {
     return 0;
 }
 
-method _iterate {
+sub _iterate($self) {
     my $op_id = $self->memory_cell( $self->op_ptr ); 
  
     if ( $self->debug ) { 
@@ -127,13 +133,13 @@ method _iterate {
 }
 
 sub _incr_op_ptr {
-    $_[0]->set_op_ptr( $_[0]->op_ptr + ( $_[1] || 1 ) );
+    $_[0]->op_ptr( $_[0]->op_ptr + ( $_[1] || 1 ) );
 }
 
 sub _incr_mem_ptr {
     my ( $self, $increment ) = @_;
     $increment ||= 1;
-    $self->set_mem_ptr( ( $self->mem_ptr + $increment ) % $self->byte_size );
+    $self->mem_ptr( ( $self->mem_ptr + $increment ) % $self->byte_size );
 }
 
 sub _incr_mem {
@@ -144,19 +150,18 @@ sub _incr_mem {
             $self->byte_size );
 }
 
-method _set_current_mem ( Int $value ) {
+sub _set_current_mem ($self, $value ) {
     return $self->memory_set( $self->mem_ptr => $value );
 }
 
-method _get_current_mem {
+
+sub _get_current_mem($self) {
     return $self->memory_cell( $self->mem_ptr );
 }
 
-sub _current_op {
-    return $_[0]->memory_cell( $_[0]->op_ptr ) || 0;
+sub _current_op($self) {
+    return $self->memory_cell( $self->op_ptr ) || 0;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 'End of Language::l33t';
 
@@ -222,7 +227,7 @@ The size of a byte in the memory used by the interpreter. Defaults to
 
 =back
 
-=head2 set_source( $l33tcode )
+=head2 source( $l33tcode )
 
 Loads and "compiles" the string $l33tcode. If one program was already loaded,
 it is clobbered by the newcomer. 

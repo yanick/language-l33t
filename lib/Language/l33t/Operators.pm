@@ -1,25 +1,26 @@
 package Language::l33t::Operators;
 # ABSTRACT: Implementation of the l33t language operators
 
-use Moose::Role;
+use Moo::Role;
 
-use Method::Signatures;
-use Readonly;
+use Const::Fast;
 use Carp;
+
+use experimental 'signatures';
 
 requires qw/ _incr_op_ptr _incr_mem_ptr _incr_mem /;
 
-Readonly our $NOP => 0;
-Readonly our $WRT => 1;
-Readonly our $RD  => 2;
-Readonly our $IF  => 3;
-Readonly our $EIF => 4;
-Readonly our $FWD => 5;
-Readonly our $BAK => 6;
-Readonly our $INC => 7;
-Readonly our $DEC => 8;
-Readonly our $CON => 9;
-Readonly our $END => 10;
+const our $NOP => 0;
+const our $WRT => 1;
+const our $RD  => 2;
+const our $IF  => 3;
+const our $EIF => 4;
+const our $FWD => 5;
+const our $BAK => 6;
+const our $INC => 7;
+const our $DEC => 8;
+const our $CON => 9;
+const our $END => 10;
 
 our @op_codes;
 
@@ -35,8 +36,7 @@ $op_codes[$DEC] = \&_dec;
 $op_codes[$CON] = \&_con;
 $op_codes[$END] = \&_end;
 
-sub opcode {
-    my $index = $_[1];
+sub opcode($self,$index) {
     if ( $index > $#op_codes or $index < 0 ) {
         warn "j00 4r3 teh 5ux0r\n";
         $index = $NOP;
@@ -45,21 +45,19 @@ sub opcode {
 }
 
 
-sub _inc {
-    my $self = shift;
-    my $sign = shift || 1;
+sub _inc($self,$sign=1) {
     $self->_incr_op_ptr;
     $self->_incr_mem( $sign * ( 1 + $self->memory_cell( $self->op_ptr ) ) );
     $self->_incr_op_ptr;
     return 1;
 }
 
-sub _dec {
-    return $_[0]->_inc( -1 );
+sub _dec($self) {
+    return $self->_inc( -1 );
 }
 
-sub _nop {
-    $_[0]->_incr_op_ptr;
+sub _nop($self) {
+    $self->_incr_op_ptr;
     return 1;
 }
 
@@ -68,7 +66,7 @@ sub _end {
 }
 
 
-method _con {
+sub _con($self) {
     my $ip = join '.', map { 
                             my $x = $self->_get_current_mem; 
                             $self->_incr_mem_ptr;
@@ -116,8 +114,7 @@ sub _fwd {
 
 sub  _bak { return $_[0]->_fwd( -1 ); }
 
-method _wrt { 
-        $DB::single = 1;
+sub _wrt($self) { 
     if ( my $io = $self->socket || $self->stdout ) {
         no warnings qw/ uninitialized /;
         print {$io} chr $self->_get_current_mem;
@@ -130,7 +127,7 @@ method _wrt {
     return 1;
 }
 
-method _rd {
+sub _rd($self) {
     my $chr;
 
     if ( my $io = $self->socket || $self->stdin ) {
@@ -147,7 +144,7 @@ method _rd {
 }
 
 
-method _if {
+sub _if($self) {
     if ( $self->_get_current_mem ) {
         $self->_nop;
     }
@@ -178,7 +175,7 @@ method _if {
     return 1;
 }
 
-method _eif {
+sub _eif($self) {
     if ( ! $self->_get_current_mem ) {
         $self->_nop;
     }
