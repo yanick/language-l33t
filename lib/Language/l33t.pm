@@ -7,7 +7,6 @@ use warnings;
 use Moose;
 use Carp;
 
-use MooseX::SemiAffordanceAccessor;
 use Moose::Util::TypeConstraints;
 use Method::Signatures;
 
@@ -63,7 +62,7 @@ method _build__memory {
     die "F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n" 
         if $self->memory_max_size < @memory;
 
-    $self->set_mem_ptr( $#memory );
+    $self->mem_ptr( $#memory );
     return [ @memory ];
 }
 
@@ -84,8 +83,8 @@ has op_ptr => (
 
 after _clear_memory => sub {
     my $self = shift;
-    $self->set_op_ptr(0);
-    $self->set_mem_ptr(0);
+    $self->op_ptr(0);
+    $self->mem_ptr(0);
 };
 
 sub reset {
@@ -127,13 +126,13 @@ method _iterate {
 }
 
 sub _incr_op_ptr {
-    $_[0]->set_op_ptr( $_[0]->op_ptr + ( $_[1] || 1 ) );
+    $_[0]->op_ptr( $_[0]->op_ptr + ( $_[1] || 1 ) );
 }
 
 sub _incr_mem_ptr {
     my ( $self, $increment ) = @_;
     $increment ||= 1;
-    $self->set_mem_ptr( ( $self->mem_ptr + $increment ) % $self->byte_size );
+    $self->mem_ptr( ( $self->mem_ptr + $increment ) % $self->byte_size );
 }
 
 sub _incr_mem {

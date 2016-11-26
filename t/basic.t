@@ -98,13 +98,13 @@ throws_ok {
     my $l33t = Language::l33t->new( memory_max_size => 10 );
 
     for ( 1..9 ) {
-        $l33t->set_source( join ' ', 1..$_ );  
+        $l33t->source( join ' ', 1..$_ );  
         ok "program within the memory size ($_)";
     }
 
     throws_ok {
         $DB::single = 1;
-        $l33t->set_source( join ' ', 1..10 );
+        $l33t->source( join ' ', 1..10 );
     } qr/F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n/, 
         'program outside the memory size';
 }
@@ -115,7 +115,7 @@ throws_ok {
     my $output;
     open my $fh_output, '>', \$output;
     my $l33t = Language::l33t->new( stdout => $fh_output );
-    $l33t->set_source( '7 '.( '9'x( 256/9 ) ).' 7 7 1 5o5' );
+    $l33t->source( '7 '.( '9'x( 256/9 ) ).' 7 7 1 5o5' );
     $l33t->run;
     my $expected = ( 9*int( 256/9 ) + 9 ) % 256;
     is ord($output) => $expected, 'default byte size';
@@ -129,7 +129,7 @@ throws_ok {
     $l33t = Language::l33t->new( stdout => $fh_output,
                             byte_size => 11 );
 
-    $l33t->set_source( '7 9 7 1 1 5o5' );
+    $l33t->source( '7 9 7 1 1 5o5' );
     $l33t->run;
 
     is ord( $output ), 1, 'byte size';
