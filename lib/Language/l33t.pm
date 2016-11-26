@@ -221,7 +221,7 @@ The size of a byte in the memory used by the interpreter. Defaults to
 
 =back
 
-=head2 set_source( $l33tcode )
+=head2 source( $l33tcode )
 
 Loads and "compiles" the string $l33tcode. If one program was already loaded,
 it is clobbered by the newcomer. 
