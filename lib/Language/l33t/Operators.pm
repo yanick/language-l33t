@@ -1,7 +1,7 @@
 package Language::l33t::Operators;
 # ABSTRACT: Implementation of the l33t language operators
 
-use Moose::Role;
+use Moo::Role;
 
 use Readonly;
 use Carp;
@@ -36,8 +36,7 @@ $op_codes[$DEC] = \&_dec;
 $op_codes[$CON] = \&_con;
 $op_codes[$END] = \&_end;
 
-sub opcode {
-    my $index = $_[1];
+sub opcode($self,$index) {
     if ( $index > $#op_codes or $index < 0 ) {
         warn "j00 4r3 teh 5ux0r\n";
         $index = $NOP;
@@ -46,21 +45,19 @@ sub opcode {
 }
 
 
-sub _inc {
-    my $self = shift;
-    my $sign = shift || 1;
+sub _inc($self,$sign=1) {
     $self->_incr_op_ptr;
     $self->_incr_mem( $sign * ( 1 + $self->memory_cell( $self->op_ptr ) ) );
     $self->_incr_op_ptr;
     return 1;
 }
 
-sub _dec {
-    return $_[0]->_inc( -1 );
+sub _dec($self) {
+    return $self->_inc( -1 );
 }
 
-sub _nop {
-    $_[0]->_incr_op_ptr;
+sub _nop($self) {
+    $self->_incr_op_ptr;
     return 1;
 }
 
