@@ -103,7 +103,6 @@ throws_ok {
     }
 
     throws_ok {
-        $DB::single = 1;
         $l33t->source( join ' ', 1..10 );
     } qr/F00l! teh c0d3 1s b1g3R th4n teh m3m0ry!!1!\n/, 
         'program outside the memory size';

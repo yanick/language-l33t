@@ -18,10 +18,15 @@ use experimental 'signatures';
 
 with 'Language::l33t::Operators';
 
-subtype 'l33tByteSize' 
-            => as 'Int' 
-            => where { $_ > 10 }
-            => message { "Byt3 s1z3 must be at l34st 11, n00b!" };
+use Types::Standard qw/ Int /;
+use Type::Tiny;
+
+my $l33tByteSize = Type::Tiny->new(
+    name       => 'L33tByteSize',
+    parent     => Int,
+    constraint => sub { $_ > 10 },
+    message    => sub  { "Byt3 s1z3 must be at l34st 11, n00b!" }
+);
 
 has debug => ( default => 0, is => 'rw' );
 has code => ( is => 'rw' );
@@ -36,7 +41,7 @@ has source => (
     },
 );
 
-has byte_size => ( is => 'ro', isa => 'l33tByteSize', default => 256 );
+has byte_size => ( is => 'ro', isa => $l33tByteSize, default => 256 );
 
 has _memory => ( 
     traits => [ 'Array' ],
