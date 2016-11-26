@@ -8,6 +8,7 @@ use warnings;
 
 use Moo;
 use MooX::HandlesVia;
+use MooseX::MungeHas 'is_rw';
 
 use Carp;
 
@@ -30,13 +31,13 @@ my $l33tByteSize = Type::Tiny->new(
     message    => sub  { "Byt3 s1z3 must be at l34st 11, n00b!" }
 );
 
-has debug => ( default => 0, is => 'rw' );
-has code => ( is => 'rw' );
+has debug => sub { 0 };
+
+has code => ();
 
 has source => (
-    is => 'rw',
-    predicate => 'has_source',
-    clearer => 'clear_source',
+    predicate => 1,
+    clearer => 1,
     trigger => sub {
         $_[0]->_clear_memory;
         $_[0]->_memory;
@@ -46,7 +47,6 @@ has source => (
 has byte_size => ( is => 'ro', isa => $l33tByteSize, default => 256 );
 
 has _memory => ( 
-    is => 'rw',
     writer => '_set_memory',
     predicate => '_has_memory',
     clearer => '_clear_memory',
@@ -81,14 +81,11 @@ has memory_max_size => (
     default => 64 * 1024,
 );
 
-has mem_ptr => ( 
-    is => 'rw',
-);
+has mem_ptr => (); 
 
 has op_ptr => ( 
     isa => Int,
     default => 0,
-    is => 'rw',
 );
 
 after _clear_memory => sub {
@@ -97,16 +94,15 @@ after _clear_memory => sub {
     $self->mem_ptr(0);
 };
 
-sub reset {
-    my $self = shift;
+sub reset($self) {
     $self->_clear_memory;
     $self->memory;
 }
 
 
-has stdout => ( is => 'rw', default => sub { return \*STDOUT;  } );
-has stdin => ( is => 'rw' ); 
-has 'socket' => ( is => 'rw' );
+has stdout => sub { return \*STDOUT;  };
+has stdin  => ();
+has socket => ();
 
 sub run ( $self, $nbr_iterations = -1 ) {
     die "L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!\n"

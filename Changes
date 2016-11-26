@@ -5,6 +5,7 @@ Revision history for Language::l33t
     - Switch Method::Signatures for bona fide signatures.
     - Switch to Type::Tiny.
     - Switch from Moose to Moo.
+    - Use MooseX::MungeHas.
 
 1.0.0     2013-03-04
     * conversion to Moose.
