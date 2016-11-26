@@ -1,6 +1,7 @@
 package Language::l33t::Operators;
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Implementation of the l33t language operators
-
+$Language::l33t::Operators::VERSION = '1.0.1';
 use Moo::Role;
 
 use Const::Fast;
@@ -188,3 +189,30 @@ sub _eif($self) {
 
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::l33t::Operators - Implementation of the l33t language operators
+
+=head1 VERSION
+
+version 1.0.1
+
+=head1 AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

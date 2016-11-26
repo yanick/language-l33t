@@ -1,6 +1,7 @@
-package Language::l33t; 
+package Language::l33t;
+our $AUTHORITY = 'cpan:YANICK'; 
 # ABSTRACT: a l33t interpreter
-
+$Language::l33t::VERSION = '1.0.1';
 use 5.20.0;
 
 use strict;
@@ -167,6 +168,18 @@ sub _current_op($self) {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Language::l33t - a l33t interpreter
+
+=head1 VERSION
+
+version 1.0.1
+
 =head1 SYNOPSIS
 
     use Language::l33t;
@@ -224,7 +237,6 @@ The size of the block of memory available to interpreter. By default set to
 The size of a byte in the memory used by the interpreter. Defaults to
 256 (so a memory byte can hold a value going from 0 to 255).
 
-
 =back
 
 =head2 source( $l33tcode )
@@ -253,7 +265,6 @@ E.g.
     # to run the same code a second time
     $l33t->reset;
     $l33t->run;
-
 
 =head2 memory
 
@@ -292,5 +303,15 @@ It goes without saying, special thanks go
 to Stephen McGreal and Alex Mole for inventing l33t. 
 They are teh rOxX0rs.
 
-=cut
+=head1 AUTHOR
 
+Yanick Champoux <yanick@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
