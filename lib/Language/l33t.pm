@@ -36,10 +36,10 @@ has code => ();
 
 has source => (
     predicate => 1,
-    clearer => 1,
-    trigger => sub {
-        $_[0]->_clear_memory;
-        $_[0]->_memory;
+    clearer   => 1,
+    trigger   => sub($self,@) {
+        $self->_clear_memory;
+        $self->_memory;
     },
 );
 
@@ -76,19 +76,18 @@ sub _build__memory($self) {
 }
 
 has memory_max_size => ( 
-    is => 'ro', 
+    is      => 'ro',
     default => 64 * 1024,
 );
 
 has mem_ptr => (); 
 
 has op_ptr => ( 
-    isa => Int,
+    isa     => Int,
     default => 0,
 );
 
-after _clear_memory => sub {
-    my $self = shift;
+after _clear_memory => sub($self) {
     $self->op_ptr(0);
     $self->mem_ptr(0);
 };
@@ -103,9 +102,12 @@ has stdout => sub { return \*STDOUT;  };
 has stdin  => ();
 has socket => ();
 
-sub run ( $self, $nbr_iterations = -1 ) {
+before run => sub($self,@) {
     die "L0L!!1!1!! n0 l33t pr0gr4m l04d3d, sUxX0r!\n"
         unless $self->_has_memory;
+};
+
+sub run ( $self, $nbr_iterations = -1 ) {
   
     while ( $self->_iterate ) {
         $nbr_iterations-- if $nbr_iterations != -1;
