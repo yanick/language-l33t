@@ -6,7 +6,9 @@ use 5.20.0;
 use strict;
 use warnings;
 
-use Moose;
+use Moo;
+use MooX::HandlesVia;
+
 use Carp;
 
 use Moose::Util::TypeConstraints;
@@ -18,7 +20,7 @@ use experimental 'signatures';
 
 with 'Language::l33t::Operators';
 
-use Types::Standard qw/ Int /;
+use Types::Standard qw/ Int ArrayRef /;
 use Type::Tiny;
 
 my $l33tByteSize = Type::Tiny->new(
@@ -44,13 +46,14 @@ has source => (
 has byte_size => ( is => 'ro', isa => $l33tByteSize, default => 256 );
 
 has _memory => ( 
-    traits => [ 'Array' ],
     is => 'rw',
     writer => '_set_memory',
     predicate => '_has_memory',
     clearer => '_clear_memory',
-    isa => 'ArrayRef[Int]',
-    lazy_build => 1,
+    isa => ArrayRef[Int],
+    lazy => 1,
+    builder => 1,
+    handles_via => 'Array',
     handles => {
         memory => 'elements',
         set_memory_cell => 'set',
@@ -83,7 +86,7 @@ has mem_ptr => (
 );
 
 has op_ptr => ( 
-    isa => 'Int',
+    isa => Int,
     default => 0,
     is => 'rw',
 );
