@@ -41,7 +41,7 @@ sub opcode($self,$index) {
         warn "j00 4r3 teh 5ux0r\n";
         $index = $NOP;
     }
-    return $op_codes[ $index ]->( $_[0] );
+    return $op_codes[ $index ]->($self);
 }
 
 
