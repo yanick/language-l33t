@@ -1,18 +1,19 @@
 Revision history for Language::l33t
 
 {{$NEXT}}
- [API CHANGES]
+ - API CHANGES
+ - NEW FEATURES
+ - ENHANCEMENTS
+ - BUG FIXES
+ - DOCUMENTATION
+ - STATISTICS
 
- [BUG FIXES]
-
- [DOCUMENTATION]
-
+1.1.0 2026-01-25
  [ENHANCEMENTS]
  - Move testing to Test2.
 
- [NEW FEATURES]
-
  [STATISTICS]
+ - code churn: 6 files changed, 58 insertions(+), 56 deletions(-)
 
 1.0.2 2025-08-30
  [BUG FIXES]
@@ -22,13 +23,6 @@ Revision history for Language::l33t
  - code churn: 7 files changed, 292 insertions(+), 26 deletions(-)
 
 1.0.1 2016-11-26
- - Stop using SemiAffordance accessors. 
- - Switch Method::Signatures for bona fide signatures.
- - Switch to Type::Tiny.
- - Switch from Moose to Moo.
- - Use MooseX::MungeHas.
- - Switch from Readonly to Const::Fast.
-
  [STATISTICS]
  - code churn: 6 files changed, 209 insertions(+), 108 deletions(-)
 
